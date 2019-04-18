@@ -19,7 +19,7 @@ namespace SatiriquesBot
 
         public async Task MainAsync()
         {
-            _client = new DiscordSocketClient();
+            _client = new DiscordSocketClient(new DiscordSocketConfig() { MessageCacheSize = 1000});
             _commandService = new CommandService();
             _commandHandler = new CommandHandler(_client, _commandService);
 
