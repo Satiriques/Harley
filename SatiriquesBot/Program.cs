@@ -49,6 +49,7 @@ namespace SatiriquesBot
         private Task Ready()
         {
             MagicHelper.UseEmojis(_client.GetGuild(246090768240869386).Emotes);
+            _client.SetGameAsync("prefix ;");
             return Task.CompletedTask;
         }
 

@@ -16,7 +16,7 @@ namespace SatiriquesBot.Modules.Magic
             _cardService = cardService;
         }
 
-        [Command("card")]
+        [Command("mtg")]
         public async Task CardAsync([Remainder]string name)
         {
             var result = await _cardService.Where(x => x.Name, name).AllAsync();

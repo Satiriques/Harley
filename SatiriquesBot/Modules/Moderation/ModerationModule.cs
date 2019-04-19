@@ -16,8 +16,15 @@ namespace SatiriquesBot.Modules.Moderation
         {
             var chan = Context.Channel as SocketTextChannel;
             var messages = await chan.GetMessagesAsync(1000).FlattenAsync();
-            var messagesToRemove = messages.Where(x => x.Content.StartsWith(".") || x.Author.IsBot);
+            var messagesToRemove = messages.Where(x => x.Content.StartsWith(";") || x.Author.IsBot);
             await chan.DeleteMessagesAsync(messagesToRemove);
+        }
+
+        [Command("rename")]
+        [RequireOwner]
+        public async Task RenameAsync(string username)
+        {
+            await Context.Client.CurrentUser.ModifyAsync(x => x.Username = username);
         }
     }
 }
