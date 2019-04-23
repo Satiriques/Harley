@@ -2,11 +2,11 @@
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using MtgApiManager.Lib.Service;
+using SatiriquesBot.Database.Contexts;
+using SatiriquesBot.Database.Controllers;
 
 namespace SatiriquesBot.Services
 {
@@ -35,6 +35,10 @@ namespace SatiriquesBot.Services
             // dependencies that are specified under the constructor 
             // for us.
             .AddSingleton<CommandHandler>()
+            
+            .AddDbContext<UserContext>()
+            .AddTransient<UserController>()
+            
             .BuildServiceProvider();
 
         public async Task InstallCommandsAsync()

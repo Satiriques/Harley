@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using SatiriquesBot.Services;
 using Discord.Commands;
 using SatiriquesBot.Modules.Magic;
+using SatiriquesBot.Database.Entities;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SatiriquesBot
 {
@@ -33,15 +36,12 @@ namespace SatiriquesBot
             // Internet or by using other methods such as reading from 
             // a configuration.
             var token = Environment.GetEnvironmentVariable("DiscordToken", EnvironmentVariableTarget.User);
-
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
             await _commandHandler.InstallCommandsAsync();
 
             
-
-
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }

@@ -6,6 +6,7 @@ using Discord.Commands;
 using System.Linq;
 using Discord;
 using Discord.WebSocket;
+using System.IO;
 
 namespace SatiriquesBot.Modules.Moderation
 {
@@ -16,15 +17,16 @@ namespace SatiriquesBot.Modules.Moderation
         {
             var chan = Context.Channel as SocketTextChannel;
             var messages = await chan.GetMessagesAsync(1000).FlattenAsync();
-            var messagesToRemove = messages.Where(x => x.Content.StartsWith(";") || x.Author.IsBot);
+            var messagesToRemove = messages.Where(x => x.Content.StartsWith(";") || x.Author == Context.Guild.CurrentUser);
             await chan.DeleteMessagesAsync(messagesToRemove);
         }
 
-        [Command("rename")]
+        [Command("say")]
         [RequireOwner]
-        public async Task RenameAsync(string username)
+        public async Task SayAsync([Remainder]string text)
         {
-            await Context.Client.CurrentUser.ModifyAsync(x => x.Username = username);
+            await ReplyAsync(Format.Code(text, ""));
         }
+        
     }
 }
