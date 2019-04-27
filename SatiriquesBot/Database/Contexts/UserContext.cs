@@ -2,13 +2,14 @@
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using SatiriquesBot.Database.Entities;
+using Discord.Addons.Interactive;
 
 namespace SatiriquesBot.Database.Contexts
 {
     public class UserContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        public DbSet<Page> Pages { get; set; }
+        public DbSet<UserPage> Pages { get; set; }
 
         public UserContext()
         {

@@ -11,6 +11,7 @@ namespace SatiriquesBot.Modules.Anilist
     public class AnilistModule : ModuleBase<SocketCommandContext>
     {
         [Command("manga")]
+        [Alias("m")]
         public async Task MangeAsync([Remainder]string query)
         {
             AnilistClient client = new AnilistClient();
@@ -18,36 +19,32 @@ namespace SatiriquesBot.Modules.Anilist
             await ReplyAsync(embed: AnilistHelper.BuildEmbed(ch));
         }
 
-        [Command("char")]
-        public async Task CharacterAsync([Remainder]string query)
+        [Command("character")]
+        [Alias("char", "c")]
+        [Summary("Gets a character from name.")]
+        public async Task CharacterAsync([Remainder]string name)
         {
             AnilistClient client = new AnilistClient();
-            var ch = await client.GetCharacterAsync(query);
+            var ch = await client.GetCharacterAsync(name);
             await ReplyAsync(embed: AnilistHelper.BuildEmbed(ch));
         }
 
-        [Command("vizioz")]
+        [Command("staff")]
+        [Alias("s")]
+        [Summary("Gets a character from an id.")]
         public async Task UserAsync([Remainder]string query)
         {
             AnilistClient client = new AnilistClient();
-            var ch = await client.GetCharacterAsync(query);
-            string nom = ch.FirstName + ch.LastName;
+            var ch = await client.GetStaffAsync(query);
+            await ReplyAsync(embed: AnilistHelper.BuildEmbed(ch));
+        }
 
-            var embed = new EmbedBuilder()
-            {
-                Title = nom.PadLeft(5, ','),
-                Url = ch.SiteUrl,
-                Description = ch.Description,
-                ThumbnailUrl = ch.LargeImageUrl,
-                Color = Discord.Color.Red,
-                Footer = new EmbedFooterBuilder()
-                {
-                    IconUrl = ch.LargeImageUrl,
-                    Text = ch.Id.ToString()
-                }
-            }.Build();
-
-            await ReplyAsync(embed: embed);
+        [Command("staff")]
+        public async Task UserAsync([Remainder]long id)
+        {
+            AnilistClient client = new AnilistClient();
+            var ch = await client.GetStaffAsync(id);
+            await ReplyAsync(embed: AnilistHelper.BuildEmbed(ch));
         }
     }
 }

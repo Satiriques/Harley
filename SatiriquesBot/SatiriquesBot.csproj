@@ -7,14 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.3" />
     <PackageReference Include="Discord.Net" Version="2.0.1" />
     <PackageReference Include="Discord.Net.Commands" Version="2.0.1" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.0.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
-    <PackageReference Include="Miki.Anilist" Version="0.6.0-beta2" />
+    <PackageReference Include="morelinq" Version="3.1.1" />
     <PackageReference Include="MtgApiManager.Lib" Version="1.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Miki.Anilist">
+      <HintPath>..\lib\Miki.Anilist.dll</HintPath>
+    </Reference>
+    <Reference Include="Miki.GraphQL">
+      <HintPath>..\lib\Miki.GraphQL.dll</HintPath>
+    </Reference>
+    <Reference Include="Miki.Net.Http">
+      <HintPath>..\lib\Miki.Net.Http.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

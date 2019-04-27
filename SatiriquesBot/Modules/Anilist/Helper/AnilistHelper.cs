@@ -25,11 +25,13 @@ namespace SatiriquesBot.Modules.Anilist.Helper
         {
             var ch = characterSearchResult as ICharacter;
 
+            var test = ch.Description.Replace("~!", "||").Replace("!~", "||");
+
             return new EmbedBuilder()
             {
                 Title = ch.LastName + ", " + ch.FirstName,
                 ThumbnailUrl = ch.LargeImageUrl,
-                Description = ch.Description.Replace("~!", "||").Replace("!~", "||"),
+                Description = ch.Description.Replace("~!", "||").Replace("!~", "||").Remove(2000),
                 Url = ch.SiteUrl
             }.Build();
         }

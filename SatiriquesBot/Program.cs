@@ -22,7 +22,7 @@ namespace SatiriquesBot
 
         public async Task MainAsync()
         {
-            _client = new DiscordSocketClient(new DiscordSocketConfig() { MessageCacheSize = 1000});
+            _client = new DiscordSocketClient(new DiscordSocketConfig() { MessageCacheSize = 100000});
             _commandService = new CommandService();
             _commandHandler = new CommandHandler(_client, _commandService);
 
@@ -40,7 +40,7 @@ namespace SatiriquesBot
             await _client.StartAsync();
 
             await _commandHandler.InstallCommandsAsync();
-
+            
             
             // Block this task until the program is closed.
             await Task.Delay(-1);

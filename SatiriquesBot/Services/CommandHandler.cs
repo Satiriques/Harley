@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 using MtgApiManager.Lib.Service;
 using SatiriquesBot.Database.Contexts;
 using SatiriquesBot.Database.Controllers;
+using Discord.Addons.Interactive;
+using Discord;
+using System.Text.RegularExpressions;
+using System.Linq;
+using SatiriquesBot.Modules.Magic;
 
 namespace SatiriquesBot.Services
 {
@@ -15,6 +20,8 @@ namespace SatiriquesBot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private IServiceProvider _services;
+        private Regex _magicRegex = new Regex(@"\[\[(.*?)\]\]");
+        public static char Prefix = '\'';
 
         public CommandHandler(DiscordSocketClient client, CommandService commands)
         {
@@ -38,6 +45,8 @@ namespace SatiriquesBot.Services
             
             .AddDbContext<UserContext>()
             .AddTransient<UserController>()
+
+            .AddSingleton<InteractiveService>()
             
             .BuildServiceProvider();
 
@@ -56,6 +65,8 @@ namespace SatiriquesBot.Services
             // See Dependency Injection guide for more information.
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                                             services: _services);
+
+            IUserExtensions.Configure(_services.GetService<UserController>());
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
@@ -66,10 +77,11 @@ namespace SatiriquesBot.Services
 
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
-
+ 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix(';', ref argPos) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
+            if (!(message.HasCharPrefix(Prefix, ref argPos) ||
+                message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
+                _magicRegex.IsMatch(message.Content)) ||
                 message.Author.IsBot)
                 return;
 
@@ -78,20 +90,34 @@ namespace SatiriquesBot.Services
 
             // Execute the command with the command context we just
             // created, along with the service provider for precondition checks.
+            IResult result = null;
 
-            // Keep in mind that result does not indicate a return value
-            // rather an object stating if the command executed successfully.
-            var result = await _commands.ExecuteAsync(
+            if (_magicRegex.IsMatch(message.Content))
+            {
+                var matchResult = _magicRegex.Match(message.Content).Groups[1].Value;
+                var searchResult = _commands.Search("mtg");
+                var command = searchResult.Commands.FirstOrDefault();
+                await command.ExecuteAsync(context, new[] { matchResult }, command.Command.Parameters, _services);
+            }
+            else
+            {
+                result = await _commands.ExecuteAsync(
                 context: context,
                 argPos: argPos,
                 services: _services);
+            }
+
+            if (!result.IsSuccess)
+                await context.Channel.SendMessageAsync(result.ErrorReason);
+            // Keep in mind that result does not indicate a return value
+            // rather an object stating if the command executed successfully.
+
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
-            if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync(result.ErrorReason);
+
         }
     }
 }
