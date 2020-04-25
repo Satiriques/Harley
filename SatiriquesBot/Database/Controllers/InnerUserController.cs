@@ -17,7 +17,7 @@ namespace SatiriquesBot.Database.Controllers
 
         private async Task<User> InnerGetUserAsync(IUser user)
         { 
-            var result = await _db.Users.SingleOrDefaultAsync(x => x.DiscordId == user.Id);
+            var result = await _db.Users.AsQueryable().SingleOrDefaultAsync(x => x.DiscordId == user.Id);
             if (result == null)
                 return result;
 
@@ -25,7 +25,7 @@ namespace SatiriquesBot.Database.Controllers
             return result;
         }
         private async Task<UserPage[]> InnerGetPagesAsync(IUser user)
-            => await _db.Pages.Where(x => x.DiscordId == user.Id).ToArrayAsync();
+            => await _db.Pages.AsQueryable().Where(x => x.DiscordId == user.Id).ToArrayAsync();
 
         private async Task InnerAddUserAsync(User user)
         {

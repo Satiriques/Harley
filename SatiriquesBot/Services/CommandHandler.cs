@@ -21,7 +21,10 @@ namespace SatiriquesBot.Services
         private readonly CommandService _commands;
         private IServiceProvider _services;
         private Regex _magicRegex = new Regex(@"\[\[(.*?)\]\]");
+        private Regex _hexRegex = new Regex(@"\A\b[0-9a-fA-F]{8}\b\Z");
         public static char Prefix = '\'';
+        private ulong _julId = 122138771121635329;
+        private ulong _maxId = 126747994795016193;
 
         public CommandHandler(DiscordSocketClient client, CommandService commands)
         {
@@ -81,7 +84,8 @@ namespace SatiriquesBot.Services
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (!(message.HasCharPrefix(Prefix, ref argPos) ||
                 message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
-                _magicRegex.IsMatch(message.Content)) ||
+                _magicRegex.IsMatch(message.Content) ||
+                _hexRegex.IsMatch(message.Content)) ||
                 message.Author.IsBot)
                 return;
 
@@ -97,7 +101,22 @@ namespace SatiriquesBot.Services
                 var matchResult = _magicRegex.Match(message.Content).Groups[1].Value;
                 var searchResult = _commands.Search("mtg");
                 var command = searchResult.Commands.FirstOrDefault();
-                await command.ExecuteAsync(context, new[] { matchResult }, command.Command.Parameters, _services);
+                result = await command.ExecuteAsync(context, new[] { matchResult }, command.Command.Parameters, _services);
+            }
+            else if (_hexRegex.IsMatch(message.Content))
+            {
+                // max
+                if(context.Message.Author.Id == _maxId)
+                {
+                    var julUser = context.Guild.GetUser(_julId);
+                    await context.Channel.SendMessageAsync("u trya throw sum hands? <:stank:584408549606817809> " + julUser.Mention);
+                }
+                // moi
+                else if(context.Message.Author.Id == _julId)
+                {
+                    var maxUser = context.Guild.GetUser(_maxId);
+                    await context.Channel.SendFileAsync("im-about-to-end.jpg", maxUser.Mention);
+                }
             }
             else
             {
