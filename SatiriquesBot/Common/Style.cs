@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SatiriquesBot.Common
+﻿namespace SatiriquesBot.Common
 {
     public static class Style
     {

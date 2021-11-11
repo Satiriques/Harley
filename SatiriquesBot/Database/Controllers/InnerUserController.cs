@@ -1,13 +1,9 @@
 ﻿using SatiriquesBot.Database.Contexts;
 using SatiriquesBot.Database.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Discord;
-using static Discord.Addons.Interactive.PaginatedMessage;
 
 namespace SatiriquesBot.Database.Controllers
 {

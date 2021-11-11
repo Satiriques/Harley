@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Discord;
 using Discord.Commands;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive;
 using System.Linq;
+using Interactivity;
+using Interactivity.Pagination;
 using MoreLinq;
 using SatiriquesBot.Attributes;
 
@@ -13,12 +12,15 @@ namespace SatiriquesBot.Modules.Help
 {
     [Group("help")]
     [ExcludeFromHelp]
-    public class HelpModule : InteractiveBase<SocketCommandContext>
+    public class HelpModule : ModuleBase
     {
-        private CommandService _commandService = new CommandService();
-        public HelpModule(CommandService service)
+        private readonly CommandService _commandService;
+        private readonly InteractivityService _interactivityService;
+
+        public HelpModule(CommandService service, InteractivityService interactivityService)
         {
             _commandService = service;
+            _interactivityService = interactivityService;
         }
 
         [Command(RunMode = RunMode.Async)]
@@ -26,20 +28,20 @@ namespace SatiriquesBot.Modules.Help
         public async Task HelpAsync()
         {
             var commands = _commandService.Commands
-                .Where(x=>!x.Module.Attributes.Any(z=>z.GetType() == typeof(ExcludeFromHelpAttribute)))
-                .Where(x=>!x.Attributes.Any(z=>z.GetType() == typeof(ExcludeFromHelpAttribute)))
+                .Where(x => x.Module.Attributes.All(z => z.GetType() != typeof(ExcludeFromHelpAttribute)))
+                .Where(x => x.Attributes.All(z => z.GetType() != typeof(ExcludeFromHelpAttribute)))
                 .DistinctBy(x => x.Aliases[0])
                 .GroupBy(x => x.Module)
-                .OrderBy(x=>x.Key.Name)
+                .OrderBy(x => x.Key.Name)
                 .ToDictionary(x => x.Key);
 
-            await PagedReplyAsync(new PaginatedMessage()
-            {
-                Pages = commands.Select(x => HelpPageBuilder
-                                .Build(x.Value.OrderBy(y=>y.Name), x.Key))
-            }, new ReactionList() { First = true, Last = true, Trash = true });
+            var pages = commands.Select(x => HelpPageBuilder
+                .Build(x.Value.OrderBy(y => y.Name), x.Key));
+
+            await _interactivityService.SendPaginatorAsync(
+                new StaticPaginatorBuilder() {Pages = pages.ToList()}.Build(), Context.Channel);
         }
-        
+
         [Command]
         public async Task HelpAsync(string query)
         {
@@ -50,9 +52,9 @@ namespace SatiriquesBot.Modules.Help
             if (commands.Any())
             {
                 var signatures = commands.Select(x =>
-                $"'{Format.Bold(x.Aliases[0])} " +
-                $"{string.Join(" ", x.Parameters.Select(y => (y.IsOptional ? $"[{y.Name}]" : y.Name)))}" +
-                $"{(string.IsNullOrWhiteSpace(x.Summary) ? "" : Environment.NewLine + x.Summary + Environment.NewLine)}");
+                    $"'{Format.Bold(x.Aliases[0])} " +
+                    $"{string.Join(" ", x.Parameters.Select(y => (y.IsOptional ? $"[{y.Name}]" : y.Name)))}" +
+                    $"{(string.IsNullOrWhiteSpace(x.Summary) ? "" : Environment.NewLine + x.Summary + Environment.NewLine)}");
 
                 await ReplyAsync(embed: new EmbedBuilder()
                 {
@@ -60,11 +62,12 @@ namespace SatiriquesBot.Modules.Help
                     Description = string.Join(Environment.NewLine, signatures),
                     Footer = new EmbedFooterBuilder()
                     {
-                        Text = (commands[0].Aliases.Count > 1 ? $"Aliases: {string.Join(", ",commands[0].Aliases.Skip(1))}" : ""),
+                        Text = (commands[0].Aliases.Count > 1
+                            ? $"Aliases: {string.Join(", ", commands[0].Aliases.Skip(1))}"
+                            : ""),
                     }
                 }.Build());
             }
-                
         }
     }
 }

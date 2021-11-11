@@ -1,9 +1,5 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using static Discord.Addons.Interactive.PaginatedMessage;
 
 namespace SatiriquesBot.Database.Entities
 {

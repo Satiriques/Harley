@@ -1,10 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Miki.Anilist;
-using System.Linq;
 using SatiriquesBot.Modules.Anilist.Helper;
-using Discord;
-using System;
 
 namespace SatiriquesBot.Modules.Anilist
 {

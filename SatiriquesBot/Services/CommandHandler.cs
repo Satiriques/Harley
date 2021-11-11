@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 using MtgApiManager.Lib.Service;
 using SatiriquesBot.Database.Contexts;
 using SatiriquesBot.Database.Controllers;
-using Discord.Addons.Interactive;
 using Discord;
 using System.Text.RegularExpressions;
 using System.Linq;
-using SatiriquesBot.Modules.Magic;
+using Interactivity;
 
 namespace SatiriquesBot.Services
 {
@@ -22,7 +21,7 @@ namespace SatiriquesBot.Services
         private IServiceProvider _services;
         private Regex _magicRegex = new Regex(@"\[\[(.*?)\]\]");
         private Regex _hexRegex = new Regex(@"\A\b[0-9a-fA-F]{8}\b\Z");
-        public static char Prefix = '\'';
+        public static char Prefix = ';';
         private ulong _julId = 122138771121635329;
         private ulong _maxId = 126747994795016193;
 
@@ -36,7 +35,8 @@ namespace SatiriquesBot.Services
         private IServiceProvider BuildServiceProvider() => new ServiceCollection()
             .AddSingleton(_client)
             .AddSingleton(_commands)
-            .AddSingleton<CardService>()
+            .AddSingleton<IMtgServiceProvider, MtgServiceProvider>()
+            .AddSingleton(s => s.GetService<IMtgServiceProvider>().GetCardService())
             // You can pass in an instance of the desired type
             // ...or by using the generic method.
             //
@@ -45,12 +45,10 @@ namespace SatiriquesBot.Services
             // dependencies that are specified under the constructor 
             // for us.
             .AddSingleton<CommandHandler>()
-            
             .AddDbContext<UserContext>()
             .AddTransient<UserController>()
 
-            .AddSingleton<InteractiveService>()
-            
+            .AddSingleton<InteractivityService>()
             .BuildServiceProvider();
 
         public async Task InstallCommandsAsync()
@@ -67,7 +65,7 @@ namespace SatiriquesBot.Services
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
-                                            services: _services);
+                services: _services);
 
             IUserExtensions.Configure(_services.GetService<UserController>());
         }
@@ -80,12 +78,12 @@ namespace SatiriquesBot.Services
 
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
- 
+
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (!(message.HasCharPrefix(Prefix, ref argPos) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
-                _magicRegex.IsMatch(message.Content) ||
-                _hexRegex.IsMatch(message.Content)) ||
+                  message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
+                  _magicRegex.IsMatch(message.Content) ||
+                  _hexRegex.IsMatch(message.Content)) ||
                 message.Author.IsBot)
                 return;
 
@@ -101,18 +99,20 @@ namespace SatiriquesBot.Services
                 var matchResult = _magicRegex.Match(message.Content).Groups[1].Value;
                 var searchResult = _commands.Search("mtg");
                 var command = searchResult.Commands.FirstOrDefault();
-                result = await command.ExecuteAsync(context, new[] { matchResult }, command.Command.Parameters, _services);
+                result = await command.ExecuteAsync(context, new[] {matchResult}, command.Command.Parameters,
+                    _services);
             }
             else if (_hexRegex.IsMatch(message.Content))
             {
                 // max
-                if(context.Message.Author.Id == _maxId)
+                if (context.Message.Author.Id == _maxId)
                 {
                     var julUser = context.Guild.GetUser(_julId);
-                    await context.Channel.SendMessageAsync("u trya throw sum hands? <:stank:584408549606817809> " + julUser.Mention);
+                    await context.Channel.SendMessageAsync("u trya throw sum hands? <:stank:584408549606817809> " +
+                                                           julUser.Mention);
                 }
                 // moi
-                else if(context.Message.Author.Id == _julId)
+                else if (context.Message.Author.Id == _julId)
                 {
                     var maxUser = context.Guild.GetUser(_maxId);
                     await context.Channel.SendFileAsync("im-about-to-end.jpg", maxUser.Mention);
@@ -121,9 +121,9 @@ namespace SatiriquesBot.Services
             else
             {
                 result = await _commands.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: _services);
+                    context: context,
+                    argPos: argPos,
+                    services: _services);
             }
 
             if (!result.IsSuccess)
@@ -136,7 +136,6 @@ namespace SatiriquesBot.Services
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
-
         }
     }
 }

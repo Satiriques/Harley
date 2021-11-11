@@ -1,11 +1,9 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Discord.Commands;
 using Discord;
-using Discord.WebSocket;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis.Scripting;
 
 public class ExecuteModule : ModuleBase<SocketCommandContext>

@@ -1,25 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
 using MtgApiManager.Lib.Service;
 using System.Linq;
 using MoreLinq;
-using Discord.Addons.Interactive;
 using System.Net.Http;
 using HtmlAgilityPack;
+using Interactivity;
+using Interactivity.Pagination;
 
 namespace SatiriquesBot.Modules.Magic
 {
     [Name("Magic the Gathering")]
-    public class MagicModule : InteractiveBase<SocketCommandContext>
+    public class MagicModule : ModuleBase<SocketCommandContext>
     {
-        private readonly CardService _cardService;
+        private readonly ICardService _cardService;
+        private readonly InteractivityService _interactivityService;
 
-        public MagicModule(CardService cardService)
+        public MagicModule(ICardService cardService, InteractivityService interactivityService)
         {
             _cardService = cardService;
+            _interactivityService = interactivityService;
         }
 
         [Command("mtg", RunMode = RunMode.Async)]
@@ -28,9 +29,11 @@ namespace SatiriquesBot.Modules.Magic
             var result = await _cardService.Where(x => x.Name, name).AllAsync();
             var cards = result.Value.DistinctBy(x => x.Name).ToArray();
             var pages = cards.Select((x, i) => MagicHelper.BuildPage(x,i,cards.Length));
-            if (result.IsSuccess && result.Value.Count > 0)
-                await PagedReplyAsync(new PaginatedMessage() { Pages = pages }, new ReactionList() { Backward = true, First = true, Last = true, Trash = true });
+            
+            var paginator = new StaticPaginatorBuilder() {Pages = pages.ToList()}.Build();
 
+            if (result.IsSuccess && result.Value.Count > 0)
+                await _interactivityService.SendPaginatorAsync(paginator, Context.Channel);
         }
 
         [Command("price")]

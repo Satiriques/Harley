@@ -1,13 +1,10 @@
 ﻿using Discord;
 using SatiriquesBot.Database.Controllers;
 using SatiriquesBot.Database.Entities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Discord.Addons.Interactive;
 using System.Threading.Tasks;
-using static Discord.Addons.Interactive.PaginatedMessage;
+using Interactivity;
 
 namespace Discord
 {
@@ -29,11 +26,11 @@ namespace Discord
 
         public static Page BuildProfilePage(this IUser discordUser, bool isSelf = false)
         {
-            return new Page()
+            return new PageBuilder()
             {
                 Title = discordUser.Username,
                 ThumbnailUrl = discordUser.GetAvatarUrl()
-            };
+            }.Build();
         }
 
         private static Page[] BuildPages(UserPage[] pages, IUser user)
@@ -45,26 +42,26 @@ namespace Discord
 
             foreach(var userPage in pages)
             {
-                paginatedPages.Add(userPage.Page); 
+                paginatedPages.Add(userPage.Page);
             }
             return paginatedPages.ToArray();
         }
 
-        public static async Task<PaginatedMessage> BuildProfileAsync(this IUser discordUser)
-        {
-            var dbUser = await _db.GetUserAsync(discordUser);
-
-            return new PaginatedMessage()
-            {
-                Title = discordUser.Username,
-                Color = Color.Teal,
-                Pages = BuildPages(dbUser.Pages.ToArray(), discordUser),
-                Author = new EmbedAuthorBuilder()
-                {
-                    IconUrl = discordUser.GetAvatarUrl(),
-                    Name = discordUser.Username
-                }
-            };
-        }
+        // public static async Task<PaginatedMessage> BuildProfileAsync(this IUser discordUser)
+        // {
+        //     var dbUser = await _db.GetUserAsync(discordUser);
+        //
+        //     return new PaginatedMessage()
+        //     {
+        //         Title = discordUser.Username,
+        //         Color = Color.Teal,
+        //         Pages = BuildPages(dbUser.Pages.ToArray(), discordUser),
+        //         Author = new EmbedAuthorBuilder()
+        //         {
+        //             IconUrl = discordUser.GetAvatarUrl(),
+        //             Name = discordUser.Username
+        //         }
+        //     };
+        // }
     }
 }

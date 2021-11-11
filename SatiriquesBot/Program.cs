@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 using SatiriquesBot.Services;
 using Discord.Commands;
 using SatiriquesBot.Modules.Magic;
-using SatiriquesBot.Database.Entities;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace SatiriquesBot
 {
@@ -35,7 +32,7 @@ namespace SatiriquesBot
             // environment variables, you may find more information on the 
             // Internet or by using other methods such as reading from 
             // a configuration.
-            var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN", EnvironmentVariableTarget.Process);
+            var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN", EnvironmentVariableTarget.User);
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 

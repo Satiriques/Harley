@@ -2,7 +2,6 @@
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using SatiriquesBot.Database.Entities;
-using Discord.Addons.Interactive;
 
 namespace SatiriquesBot.Database.Contexts
 {

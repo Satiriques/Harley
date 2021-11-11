@@ -2,14 +2,13 @@
 using Discord;
 using Discord.Commands;
 using SatiriquesBot.Database.Controllers;
-using Discord.Addons.Interactive;
 using System;
 using SatiriquesBot.Database.Entities;
 using System.Linq;
 
 namespace SatiriquesBot.Modules.Social
 {
-    public class SocialModule : InteractiveBase<SocketCommandContext>
+    public class SocialModule : ModuleBase<SocketCommandContext>
     {
         private UserController _db;
         public SocialModule(UserController controller)
@@ -21,14 +20,14 @@ namespace SatiriquesBot.Modules.Social
         [Command("profile", RunMode = RunMode.Async)]
         public async Task SocialModuleAsync()
         {
-            await PagedReplyAsync(await Context.User.BuildProfileAsync(), new ReactionList());
+            // await PagedReplyAsync(await Context.User.BuildProfileAsync(), new ReactionList());
 
         }
 
         [Command("profile")]
         public async Task SocialModuleAsync(IUser user)
         {
-            await PagedReplyAsync(await user.BuildProfileAsync(), new ReactionList());
+            // await PagedReplyAsync(await user.BuildProfileAsync(), new ReactionList());
         }
 
         [Command("addpage")]

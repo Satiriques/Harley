@@ -2,14 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using Discord;
-using MtgApiManager.Lib.Core;
 using System.Linq;
+using Interactivity;
 using MtgApiManager.Lib.Model;
 using SatiriquesBot.Common;
-using static Discord.Addons.Interactive.PaginatedMessage;
 
 namespace SatiriquesBot.Modules.Magic
 {
@@ -30,7 +28,7 @@ namespace SatiriquesBot.Modules.Magic
             { "Green", 0x00733e },
             { "Blue", 0x0e68ab },
         };
-        internal static Embed BuildEmbed(Card card)
+        internal static Embed BuildEmbed(ICard card)
         {
             return new EmbedBuilder()
             {
@@ -45,15 +43,15 @@ namespace SatiriquesBot.Modules.Magic
             }.Build();
         }
 
-        internal static Page BuildPage(Card card, int index, int numberOfPages)
+        internal static PageBuilder BuildPage(ICard card, int index, int numberOfPages)
         {
-            return new Page()
+            return new PageBuilder()
             {
                 Title = card.Name + TranslateMagicString(card.ManaCost),
                 Description = BuildDescription(card.Text, card.Flavor, card.Power, card.Toughness),
                 ThumbnailUrl = card.ImageUrl?.ToString(),
                 Color = GetColor(card.Colors),
-                FooterOverride = new EmbedFooterBuilder()
+                Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Page {index+1}/{numberOfPages} — Illus. {card.Artist}",
                 }
@@ -97,6 +95,7 @@ namespace SatiriquesBot.Modules.Magic
 
         private static Color GetColor(string[] colors)
         {
+            if (colors == null) return Color.LightGrey;
             if(colors.Length == 0) return Color.LightGrey;
             return colors.Length > 1 ? Discord.Color.Gold : new Color(magicColors[colors[0]]);
         }
