@@ -5,12 +5,12 @@ using SatiriquesBot.Database.Entities;
 
 namespace SatiriquesBot.Database.Contexts
 {
-    public sealed class UserContext : DbContext
+    public sealed class NoteContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserPage> Pages { get; set; }
+        public DbSet<Note> Notes { get; set; }
+        public DbSet<NoteGroup> NoteGroups { get; set; }
 
-        public UserContext()
+        public NoteContext()
         {
             Database.EnsureCreated();
         }
@@ -26,7 +26,7 @@ namespace SatiriquesBot.Database.Contexts
 
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-            builder.UseSqlite($"Filename={Path.Combine(dir, "users.db")}");
+            builder.UseSqlite($"Filename={Path.Combine(dir, "notes.db")}");
         }
     }
 }

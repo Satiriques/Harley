@@ -47,6 +47,8 @@ namespace SatiriquesBot.Services
             .AddSingleton<CommandHandler>()
             .AddDbContext<UserContext>()
             .AddTransient<UserController>()
+            .AddDbContext<NoteContext>()
+            .AddTransient<NoteController>()
 
             .AddSingleton<InteractivityService>()
             .BuildServiceProvider();
