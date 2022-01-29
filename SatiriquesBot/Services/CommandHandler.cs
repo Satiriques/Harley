@@ -18,40 +18,39 @@ namespace SatiriquesBot.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
-        private IServiceProvider _services;
+        public IServiceProvider _services;
         private Regex _magicRegex = new Regex(@"\[\[(.*?)\]\]");
         private Regex _hexRegex = new Regex(@"\A\b[0-9a-fA-F]{8}\b\Z");
         public static char Prefix = ';';
         private ulong _julId = 122138771121635329;
         private ulong _maxId = 126747994795016193;
+        private readonly ReminderService _reminderService;
 
         public CommandHandler(DiscordSocketClient client, CommandService commands)
         {
             _commands = commands;
             _client = client;
             _services = BuildServiceProvider();
+
+            _reminderService = _services.GetService<ReminderService>();
         }
 
         private IServiceProvider BuildServiceProvider() => new ServiceCollection()
-            .AddSingleton(_client)
-            .AddSingleton(_commands)
-            .AddSingleton<IMtgServiceProvider, MtgServiceProvider>()
-            .AddSingleton(s => s.GetService<IMtgServiceProvider>().GetCardService())
-            // You can pass in an instance of the desired type
-            // ...or by using the generic method.
-            //
-            // The benefit of using the generic method is that 
-            // ASP.NET DI will attempt to inject the required
-            // dependencies that are specified under the constructor 
-            // for us.
-            .AddSingleton<CommandHandler>()
-            .AddDbContext<UserContext>()
-            .AddTransient<UserController>()
-            .AddDbContext<NoteContext>()
-            .AddTransient<NoteController>()
-
-            .AddSingleton<InteractivityService>()
-            .BuildServiceProvider();
+                                                           .AddSingleton(_client)
+                                                           .AddSingleton(_commands)
+                                                           .AddSingleton<IMtgServiceProvider, MtgServiceProvider>()
+                                                           .AddSingleton(s =>
+                                                               s.GetService<IMtgServiceProvider>().GetCardService())
+                                                           .AddSingleton<CommandHandler>()
+                                                           .AddDbContext<UserContext>()
+                                                           .AddTransient<UserController>()
+                                                           .AddDbContext<NoteContext>()
+                                                           .AddTransient<NoteController>()
+                                                           .AddDbContext<ReminderContext>()
+                                                           .AddTransient<ReminderController>()
+                                                           .AddSingleton<ReminderService>()
+                                                           .AddSingleton<InteractivityService>()
+                                                           .BuildServiceProvider();
 
         public async Task InstallCommandsAsync()
         {

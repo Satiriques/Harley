@@ -13,6 +13,7 @@ namespace SatiriquesBot
         private DiscordSocketClient _client;
         private CommandService _commandService;
         private CommandHandler _commandHandler;
+        private IServiceProvider _serviceProvider;
 
         public static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
@@ -22,6 +23,7 @@ namespace SatiriquesBot
             _client = new DiscordSocketClient(new DiscordSocketConfig() { MessageCacheSize = 100000});
             _commandService = new CommandService();
             _commandHandler = new CommandHandler(_client, _commandService);
+            _serviceProvider = _commandHandler._services;
 
             _client.Log += Log;
             _client.Ready += Ready;
@@ -43,11 +45,14 @@ namespace SatiriquesBot
             await Task.Delay(-1);
         }
 
-        private Task Ready()
+        private async Task Ready()
         {
             MagicHelper.UseEmojis(_client.GetGuild(246090768240869386).Emotes);
-            _client.SetGameAsync("prefix ;");
-            return Task.CompletedTask;
+
+            var reminderService = _serviceProvider.GetService(typeof(ReminderService)) as ReminderService;
+            await reminderService.StartAsync(_client);
+            
+            await _client.SetGameAsync("prefix ;");
         }
 
         private Task Log(LogMessage arg)
