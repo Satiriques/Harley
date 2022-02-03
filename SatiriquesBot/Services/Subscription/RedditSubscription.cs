@@ -22,13 +22,14 @@ namespace SatiriquesBot.Services.Subscription
             var newLinks = content.feed.entry.Select(x => x.link.Href).ToArray();
 
             var linkToPost = newLinks.Except(_linkCache);
-            _linkCache.Clear();
-            _linkCache.AddRange(newLinks);
 
             foreach (var link in linkToPost)
             {
                 await ReplyAsync(link);
             }
+            
+            _linkCache.Clear();
+            _linkCache.AddRange(newLinks);
         }
 
         public override RedditContent AdaptContent(string urlResponse)
