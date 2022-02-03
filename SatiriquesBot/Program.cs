@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SatiriquesBot.Services;
 using Discord.Commands;
 using SatiriquesBot.Modules.Magic;
+using SatiriquesBot.Services.Subscription;
 
 namespace SatiriquesBot
 {
@@ -51,6 +52,9 @@ namespace SatiriquesBot
 
             var reminderService = _serviceProvider.GetService(typeof(ReminderService)) as ReminderService;
             await reminderService.StartAsync(_client);
+
+            var subscriptionService = _serviceProvider.GetService(typeof(SubscriptionService)) as SubscriptionService;
+            subscriptionService.Start();
             
             await _client.SetGameAsync("prefix ;");
         }

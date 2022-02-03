@@ -11,6 +11,7 @@ using Discord;
 using System.Text.RegularExpressions;
 using System.Linq;
 using Interactivity;
+using SatiriquesBot.Services.Subscription;
 
 namespace SatiriquesBot.Services
 {
@@ -49,6 +50,7 @@ namespace SatiriquesBot.Services
                                                            .AddDbContext<ReminderContext>()
                                                            .AddTransient<ReminderController>()
                                                            .AddSingleton<ReminderService>()
+                                                           .AddSingleton<SubscriptionService>()
                                                            .AddSingleton<InteractivityService>()
                                                            .BuildServiceProvider();
 
