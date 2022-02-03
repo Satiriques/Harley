@@ -27,9 +27,6 @@ namespace SatiriquesBot.Services.Subscription
         private async void SubscriptionCallbackAsync(ISubscription subscription)
         {
             await subscription.CheckForUpdateAsync();
-           
-            _timer.Stop();
-            
         }
 
         public void Stop()
