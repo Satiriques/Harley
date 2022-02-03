@@ -19,7 +19,7 @@ namespace SatiriquesBot.Services.Subscription
 
         public void Start()
         {
-            _timer = new Timer(TimeSpan.FromMinutes(1).TotalMilliseconds);
+            _timer = new Timer(TimeSpan.FromMinutes(15).TotalMilliseconds);
             _timer.Elapsed += (_, _) => _subscriptions.ForEach(SubscriptionCallbackAsync); 
             _timer.Start();
         }
