@@ -12,13 +12,19 @@ namespace SatiriquesBot.Services.Subscription
 {
     public class RedditSubscription : SubscriptionBase<RedditContent>
     {
-        private readonly List<string> _linkCache = new();
+        private List<string> _linkCache;
         
         public RedditSubscription(DiscordSocketClient client, ulong guildId, ulong channelId, string url) 
             : base(client, guildId, channelId, url) { }
 
         public override async Task UpdateWatcherAsync(RedditContent content)
         {
+            if (_linkCache == null)
+            {
+                _linkCache = new List<string>();
+                return;
+            }
+        
             var newLinks = content.feed.entry.Select(x => x.link.Href).ToArray();
 
             var linkToPost = newLinks.Except(_linkCache);
