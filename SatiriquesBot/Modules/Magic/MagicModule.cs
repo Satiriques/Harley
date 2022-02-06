@@ -53,5 +53,12 @@ namespace SatiriquesBot.Modules.Magic
                 await ReplyAsync(price.InnerText);
             }
         }
+
+        [Command("mtg refresh")]
+        public async Task RefreshAsync()
+        {
+            MagicHelper.UseEmojis(Context.Client.GetGuild(246090768240869386).Emotes);
+            await Task.CompletedTask;
+        }
     }
 }
