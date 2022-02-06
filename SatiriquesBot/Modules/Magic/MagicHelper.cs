@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Discord;
 using System.Linq;
+using System.Text;
 using Interactivity;
 using MtgApiManager.Lib.Model;
 using SatiriquesBot.Common;
@@ -28,27 +29,13 @@ namespace SatiriquesBot.Modules.Magic
             { "Green", 0x00733e },
             { "Blue", 0x0e68ab },
         };
-        internal static Embed BuildEmbed(ICard card)
-        {
-            return new EmbedBuilder()
-            {
-                Title = card.Name + TranslateMagicString(card.ManaCost),
-                Description = BuildDescription(card.Text, card.Flavor),
-                ThumbnailUrl = card.ImageUrl?.ToString(),
-                Color = GetColor(card.Colors),
-                Footer = new EmbedFooterBuilder()
-                {
-                    Text = card.Artist,
-                }
-            }.Build();
-        }
 
         internal static PageBuilder BuildPage(ICard card, int index, int numberOfPages)
         {
             return new PageBuilder()
             {
                 Title = card.Name + TranslateMagicString(card.ManaCost),
-                Description = BuildDescription(card.Text, card.Flavor, card.Power, card.Toughness),
+                Description = BuildDescription(card),
                 ThumbnailUrl = card.ImageUrl?.ToString(),
                 Color = GetColor(card.Colors),
                 Footer = new EmbedFooterBuilder()
@@ -80,17 +67,21 @@ namespace SatiriquesBot.Modules.Magic
             return magicString;
         }
 
-        private static string BuildDescription(string cardText, string cardFlavor, string power=null, string toughtness=null)
+        private static string BuildDescription(ICard card)
         {
-            string description = "";
-            if (!string.IsNullOrWhiteSpace(cardText))
-                description += Style.Bold(TranslateMagicString(cardText)) + Environment.NewLine;
-            description += Style.Italics(cardFlavor);
+            var description = new StringBuilder();
+            description.AppendLine(card.Type);
+            
+            if (!string.IsNullOrWhiteSpace(card.Text))
+                description.AppendLine(Style.Bold(TranslateMagicString(card.Text)));
+            description.Append(Style.Italics(card.Flavor));
 
-            if (!string.IsNullOrWhiteSpace(power))
-                description += Environment.NewLine + Environment.NewLine + Format.Bold(power + "/" + toughtness);
+            if (!string.IsNullOrWhiteSpace(card.Power))
+            {
+                description.AppendLine().AppendLine().Append(Format.Bold(card.Power + "/" + card.Toughness));
+            }
 
-            return description;
+            return description.ToString();
         }
 
         private static Color GetColor(string[] colors)
