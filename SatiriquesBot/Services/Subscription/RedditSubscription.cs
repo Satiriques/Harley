@@ -19,13 +19,13 @@ namespace SatiriquesBot.Services.Subscription
 
         public override async Task UpdateWatcherAsync(RedditContent content)
         {
+            var newLinks = content.feed.entry.Select(x => x.link.Href).ToArray();
+            
             if (_linkCache == null)
             {
-                _linkCache = new List<string>();
+                _linkCache = newLinks.ToList();
                 return;
             }
-        
-            var newLinks = content.feed.entry.Select(x => x.link.Href).ToArray();
 
             var linkToPost = newLinks.Except(_linkCache);
 
