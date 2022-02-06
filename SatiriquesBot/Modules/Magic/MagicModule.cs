@@ -29,7 +29,7 @@ namespace SatiriquesBot.Modules.Magic
         {
             var result = await _cardService.Where(x => x.Name, name).AllAsync();
             var cards = result.Value.DistinctBy(x => x.Name).ToArray();
-            var pages = cards.Select((x, i) => MagicHelper.BuildPage(x,i,cards.Length));
+            var pages = cards.OrderBy(x=>string.Compare(x.Name, name, StringComparison.OrdinalIgnoreCase)).Select((x, i) => MagicHelper.BuildPage(x,i,cards.Length));
             
             var paginator = new StaticPaginatorBuilder() {Pages = pages.ToList()}.WithTimoutedEmbed(null).Build();
 
