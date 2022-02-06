@@ -38,7 +38,16 @@ namespace SatiriquesBot.Services.Subscription
         
         public async Task CheckForUpdateAsync()
         {
-            var response = await Client.GetStringAsync(_url);
+            string response = null;
+
+            try
+            {
+                response = await Client.GetStringAsync(_url);
+            }
+            catch
+            {
+                return;
+            }
 
             if (!string.IsNullOrEmpty(response))
             {
